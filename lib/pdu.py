@@ -1,8 +1,6 @@
 import clr
 import os
-
 from pprint import pprint
-
 
 # Path to the currently running script
 script_path = os.path.abspath(__file__)
