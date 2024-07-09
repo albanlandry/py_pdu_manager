@@ -1,0 +1,26 @@
+<pdu header="IMIN" mac="00153D000C1F" flag="1" ip="10.1.142.27" subnet="255.255.255.0" gateway="10.1.142.250" port="3500" message="�&#x6;&#xF;&#x1E;&#x0;&#xD;�&#x8;&#x0;&#x1;&#x0;" other="&#x1;&#x0;&#x0;&#x0;&#x0;&#x0;	&#x1;&#x4;&#x10;&#x0;&#x1;&#x0;&#x4;&#x1;&#x0;&#x0;&#x0;NS8SLP    ">
+  <pins>
+    <pin channel="2" turnoff="False">
+      <device>beam_1_yn</device>
+      <type>NEC 프로젝터</type>
+      <ip>10.1.142.28</ip>
+      <port>7142</port>
+    </pin>
+    <pin channel="6" turnoff="True">
+      <device>Light</device>
+      <type>기본 장비</type>
+    </pin>
+    <pin channel="8" turnoff="True">
+      <device>speaker_yn</device>
+      <type>기본 장비</type>
+    </pin>
+    <pin channel="1" turnoff="False">
+      <device>PC</device>
+      <type>기본 장비</type>
+    </pin>
+    <pin channel="3" turnoff="False">
+      <device>base_t</device>
+      <type>기본 장비</type>
+    </pin>
+  </pins>
+</pdu>

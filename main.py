@@ -2,10 +2,13 @@ from ui.app import App, MainWindow, Color
 from manager.pdu import PduController
 from PyQt6.QtWidgets import QApplication
 import sys
-import lib.pdu
+import lib.pdu as lib_pdu
+from lib.pdu import ApplicationSettings, AppSettings, ConfigLoader
 
 
 if __name__ == '__main__':
+    appsetting:AppSettings = ConfigLoader.LoadSettings(lib_pdu.app_config_file_path)
+
     app = QApplication(sys.argv)
     main = MainWindow()
     main.show()
