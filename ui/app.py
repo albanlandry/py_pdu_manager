@@ -5,6 +5,8 @@ from PyQt6.QtGui import QColor, QIcon, QPalette, QPixmap, QResizeEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 import os
 
+from PDUManager.lib.pdu import PduStruct
+
 path = os.path
 
 CONFIG = {
@@ -165,7 +167,9 @@ class MainWindow(QMainWindow):
     
     def resizeEvent(self, evt):
         self.setFixedSize(evt.size())
-
+    
+    def UpdatePDU1(pduStruct: PduStruct):
+        pass
 
 class Color(QWidget):
     '''
