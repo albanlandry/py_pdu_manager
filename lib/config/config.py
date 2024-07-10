@@ -5,9 +5,9 @@ def create_default_config(file_path):
     config = configparser.ConfigParser()
 
     # Define default settings
-    config['DEFAULT'] = {
-        'ServerAliveInterval': '45',
-        'Compression': 'yes',
+    config['Scheduler'] = {
+        'ApplicationFolder': '',
+        'VideoFolder': '',
         'CompressionLevel': '9'
     }
     config['bitbucket.org'] = {

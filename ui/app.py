@@ -4,8 +4,10 @@ from PyQt6.QtWidgets import QGridLayout, QHBoxLayout, QLabel, QLayout, QLineEdit
 from PyQt6.QtGui import QColor, QIcon, QPalette, QPixmap, QResizeEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 import os
+from typing import Callable
 
-from PDUManager.lib.pdu import PduStruct
+from lib.pdu import AppSettings, PduStruct
+from utils.convert import str_to_qtime
 
 path = os.path
 
@@ -23,6 +25,23 @@ Channels = {"CH1": "PC",
             "CH4": "",
             "CH8": "앰프(오디오)"
             }
+
+'''
+Event handlers
+'''
+class PduEventHandler:
+    class TimeEventHandler:
+        onStartTimeChanged = Callable[[QTime], None]
+        onEndTimeChanged = Callable[[QTime], None]
+        onValidateStartime = Callable[[QTime], None]
+        onvalidateEndTime = Callable[[QTime], None]
+
+    class PduChannelEventHandler:
+        onButtonPressed = Callable[[bool], None]
+
+    def __init__(self): 
+        self.timeEvent = self.TimeEventHandler()
+        self.pduEvent = self.PduChannelEventHandler()
 
 class App(tk.Tk):
     '''
@@ -168,8 +187,12 @@ class MainWindow(QMainWindow):
     def resizeEvent(self, evt):
         self.setFixedSize(evt.size())
     
-    def UpdatePDU1(pduStruct: PduStruct):
-        pass
+    def updatePdu(self, id: int, pduStruct:PduStruct, config:AppSettings, eventHandler:PduEventHandler = None):
+        self.pduCtrl1.mStartTime.setTime(str_to_qtime(config.StartTime))
+        self.pduCtrl1.mEndTime.setTime(str_to_qtime(config.EndTime))
+        # print(id, pduStruct, config.StartTime)
+        if eventHandler is not None:
+            print("Initialize the event handler")
 
 class Color(QWidget):
     '''

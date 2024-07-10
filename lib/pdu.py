@@ -8,7 +8,6 @@ import html
 script_path = os.path.abspath(__file__)
 # app_config_file_path = os.path.join(os.path.dirname(script_path), "..", "config", "config.cnf")
 app_config_file_path = "/Volumes/Storage/Python/PDUManager/config/config.cnf"
-
 # pdu_config_file_path = os.path.join(os.path.dirname(script_path), "..", "config", "pdu.config.xml")
 pdu_config_file_path = "/Volumes/Storage/Python/PDUManager/config/pdu.config.xml"
 
@@ -16,7 +15,7 @@ pdu_config_file_path = "/Volumes/Storage/Python/PDUManager/config/pdu.config.xml
 clr.AddReference(os.path.join(os.path.dirname(script_path), "pdu_lib", "pdu_library.dll"))
 clr.AddReference('System.Windows.Forms')
 
-from pdu_library import PDUStruct, PDUController
+from pdu_library import PDUController, PDUStatus, PDUStruct
 from Scheduler.Models import PinData
 from Scheduler import ConfigLoader as ConfLdr, ApplicationSettings as appsettings
 import Scheduler
@@ -26,6 +25,7 @@ PduController = PDUController
 ConfigLoader = ConfLdr
 ApplicationSettings = appsettings
 AppSettings = ApplicationSettings.Settings
+PduStatus = PDUStatus
 
 def loadPDUConfig(path: str = pdu_config_file_path):
     file_content = ''
@@ -43,7 +43,7 @@ print("Sub", Scheduler.__all__)
 print("Sub", Scheduler.Models.__all__)
 print("Sub", Scheduler.Logger.__all__)
 # # print("Sub", Scheduler.Exceptions.__all__)
-pprint(Scheduler.__dict__)
+# pprint(Scheduler.__dict__)
 
 # # Parse the XML file
 # tree = ET.parse(pdu_config_file_path)
