@@ -1,10 +1,13 @@
 import tkinter as tk
-from PyQt6.QtCore import pyqtSignal, pyqtSlot, QObject, QPoint, QSize, Qt, QTime
+from PyQt6.QtCore import pyqtSignal as Signal, pyqtSlot as Slot, QObject, QPoint, QSize, Qt, QTime
 from PyQt6.QtWidgets import QGridLayout, QHBoxLayout, QLabel, QLayout, QLineEdit, QMainWindow, QPushButton, QSizePolicy, QTimeEdit, QVBoxLayout, QWidget
 from PyQt6.QtGui import QColor, QIcon, QPalette, QPixmap, QResizeEvent
-from PyQt6.QtSvgWidgets import QSvgWidget
+import math
+# from PyQt6.QtSvgWidgets import QSvgWidget
 import os
 from typing import Callable
+from enum import Enum, auto
+from functools import partial
 
 from lib.pdu import AppSettings, PduStruct
 from utils.convert import str_to_qtime
@@ -17,12 +20,12 @@ CONFIG = {
 }
 
 Channels = {"CH1": "PC", 
-            "CH5": "", 
-            "CH2": "빔프로젝터", 
-            "CH6": "조명", 
+            "CH2": "빔프로젝터",
             "CH3": "HDMI 리피터",
-            "CH7": "",
             "CH4": "",
+            "CH5": "",  
+            "CH6": "조명", 
+            "CH7": "",
             "CH8": "앰프(오디오)"
             }
 
@@ -43,6 +46,8 @@ class PduEventHandler:
         self.timeEvent = self.TimeEventHandler()
         self.pduEvent = self.PduChannelEventHandler()
 
+
+''''''
 class App(tk.Tk):
     '''
     '''
@@ -51,6 +56,10 @@ class App(tk.Tk):
         self.title(title)
         self.geometry(f"{width}x{height}")
 
+
+'''
+TitleBarWidget
+'''
 class TitleBarWidget(QWidget):
     def __init__(self, title = "App", parent: QWidget = None):
         super().__init__(parent)
@@ -116,6 +125,9 @@ class TitleBarWidget(QWidget):
             self.oldPos = event.globalPosition()
 
 
+'''
+MainWindow
+'''
 class MainWindow(QMainWindow):
     spacing: int = 60
     '''
@@ -194,6 +206,10 @@ class MainWindow(QMainWindow):
         if eventHandler is not None:
             print("Initialize the event handler")
 
+
+'''
+Color
+'''
 class Color(QWidget):
     '''
     '''
@@ -211,6 +227,10 @@ class Color(QWidget):
         if w > 0:
             self.setFixedWidth(h)
 
+
+'''
+LabelWidget
+'''
 class LabelWidget(QLabel):
     def __init__(self, text: str = "", parent: QWidget = None, size: int = 12, sizeUnit = "px", color: str = "black",
                  weight: str|int = "normal", alignment: Qt.AlignmentFlag = Qt.AlignmentFlag.AlignLeft):
@@ -239,8 +259,13 @@ class LabelWidget(QLabel):
                             color: {color};
                         }}""")
 
+
+'''
+ControlButtonWidget
+'''
 class ControlButtonWidget(QPushButton):
      '''
+     Extends QPushButton
      '''
      def __init__(self, label: str = "", w: int = 50, h: int = 50,
                   color: str = "#84CE26", pressedColor: str = "darkgreen"):
@@ -262,15 +287,32 @@ class ControlButtonWidget(QPushButton):
             }}
         """.format(color=color, pressedColor=pressedColor))
 
+
+'''
+ControlInputWidget
+'''
 BUTTON_W = 64
 BUTTON_H = 32
-
 class ControlInputWidget(QWidget):
     spacing: int = 20
     '''
     '''
+
+    ''' Signals(s) '''
+    class CIWEvent(QObject):
+        timeChanged = Signal(QTime)
+        validated = Signal(QPushButton)
+
+
     def __init__(self, label: str =""):
+        '''
+        Parameters:
+        - label (str): The label to be displayed with the control
+        '''
         super().__init__()
+
+        # Initializing events
+        self.events = self.CIWEvent()
     
         mLayout = QHBoxLayout()
         mLabel = LabelWidget(label, parent=self, size = 16, weight = 600, color="#5E6A75", alignment=Qt.AlignmentFlag.AlignVCenter)
@@ -282,15 +324,7 @@ class ControlInputWidget(QWidget):
         self.mTimeInput.setDisplayFormat("HH:mm")
         self.mTimeInput.setTime(QTime.currentTime())
         self.mTimeInput.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        # self.mTimeInput.setStyleSheet("""
-        #     QTimeEdit {
-        #         font-family: Arial;
-        #         font-size: 14px;
-        #         color: #5E6A75;
-        #         background-color: white;
-        #         border: 1px solid #B8C2CB;
-        #         padding: 5px;
-        #     }""")
+        self.mTimeInput.timeChanged.connect(self.fireTimeChanged)
 
         # Validate button
         self.validate = QPushButton(text="확인")
@@ -338,20 +372,59 @@ class ControlInputWidget(QWidget):
         else:
             raise ValueError(f"Invalid time input. Expect [str|QTime], receive [{type(time)}]")
 
+    @Slot(QTime)
+    def fireTimeChanged(self, time: QTime):
+        self.events.timeChanged.emit(time)
+
+    @Slot(QPushButton)
+    def onValidated(self, button: QPushButton):
+        self.events.validated.emit(button)
+
+
+''' Switch Widget classes '''
+class SwitchButton(Enum):
+    ON = auto()
+    OFF = auto()
+
+
+'''
+SwitchWidget
+'''
+class SWEventArgs:
+    status: SwitchButton
+    btnOn: ControlButtonWidget
+    btnOff: ControlButtonWidget
+
+    def __init__(self, status: SwitchButton, btnOn: ControlButtonWidget, btnOff: ControlButtonWidget):
+        self.status = status
+        self.btnOn = btnOn
+        self.btnOff = btnOff
 
 class SwitchWidget(QWidget):
-     '''
-     '''
-     def __init__(self, label: str =""):
+    ''' Signals(s) '''
+    class SWEvent(QObject):
+        pressed = Signal(SWEventArgs)
+
+    '''
+    '''
+    def __init__(self, label: str =""):
         super().__init__()
+
+        # Initialize the event handlers
+        self.events = self.SWEvent()
 
         self.mLayout = QVBoxLayout(self)
         self.mLayout.setContentsMargins(0, 0, 0, 0)
         self.labelUI = QLabel(text=label, parent=self)
 
-        self.buttons_layout = QHBoxLayout()
+        # Button ON
+        self.buttons_layout = QHBoxLayout() 
         self.btnOn = ControlButtonWidget(label="ON", w=BUTTON_W, h=BUTTON_H)
+        self.btnOn.pressed.connect(self.buttonOnPressed)
+
+        # Button OFF
         self.btnOff = ControlButtonWidget(label="OFF", w=BUTTON_W, h=BUTTON_H, color="#E3694E", pressedColor="crimson")
+        self.btnOff.pressed.connect(self.buttonOffPressed)
         
         # Putting the button together horizontally with a space in-between
         self.buttons_layout.addWidget(self.btnOn)
@@ -369,26 +442,68 @@ class SwitchWidget(QWidget):
 
         self.setLayout(self.mLayout)
 
+    def buttonOnPressed(self):
+        self.events.pressed.emit(SWEventArgs(SwitchButton.ON, self.btnOn, self.btnOff))
 
-class ChannelWidget(QWidget):
+    def buttonOffPressed(self):
+        self.events.pressed.emit(SWEventArgs(SwitchButton.OFF, self.btnOn, self.btnOff))
+
+
+'''
+CWEventArgs - ChannelWidget
+'''
+class CWEventArgs:
+    '''
+    Class that represents the data available when a CWEvent is raised
+    '''
+    channel: int
+    status: SwitchButton
+    button: SwitchWidget
+
+    def __init__(self, channel: int, status: SwitchButton, button: SwitchWidget):
+        self.channel = channel
+        self.status = status
+        self.button = button
+
+'''
+ChannelWidget
+'''
+class ChannelWidget(QWidget):    
+    class CWEvent(QObject):
+        buttonPressed = Signal(CWEventArgs)
+
     '''
     '''
     def __init__(self):
         super().__init__()
+        self.pressedIndex = -1
 
         mLayout = QGridLayout()
         mLayout.setHorizontalSpacing(35)
 
         #Adding all the buttons
+        nbCols = 2
+        nbRows = int(math.ceil(len(Channels.items()) / nbCols))
         row = 0
+        col = 0
         for index, (key, value) in enumerate(Channels.items()):
-            switch = SwitchWidget(f"{key}: {value}")
-            mLayout.addWidget(switch, row, index % 2)
+            if index > 0 and index % nbRows == 0:
+                col = col + 1
 
-            row = row + (index % 2)
-        
+            row = index % nbRows
+
+            switch = SwitchWidget(f"{key}: {value}")
+            mLayout.addWidget(switch, row, col)
+
+            # Attach event to the switch
+            switch.events.pressed.connect(partial(self.buttonPressed, (index, switch)))
+
+        # Setting the layout of the widget.
         self.setLayout(mLayout)
 
+    def buttonPressed(self, args, data):
+        print(args, data)
+        pass
 
 class SectionWidget(QWidget):
     '''

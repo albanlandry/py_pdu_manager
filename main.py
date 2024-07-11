@@ -10,7 +10,7 @@ if __name__ == '__main__':
     appsetting:AppSettings = ConfigLoader.LoadSettings(lib_pdu.app_config_file_path)
     pduConfig:PduStruct = ConfigLoader.LoadPDUSettings(lib_pdu.pdu_config_file_path)
     pduCtrl:PduController = PduController.GetInstance(5001)
-    pduStatus:PduStatus = pduCtrl.Status(pduConfig)
+    pduStatus:PduStatus = None # pduCtrl.Status(pduConfig)
 
     print(appsetting, pduConfig, pduStatus)
 
