@@ -40,7 +40,7 @@ class PduEventHandler:
         onvalidateEndTime = Callable[[QTime], None]
 
     class PduChannelEventHandler:
-        onButtonPressed = Callable[[bool], None]
+        onChannelPressed = Callable[[bool], None]
 
     def __init__(self): 
         self.timeEvent = self.TimeEventHandler()
@@ -146,8 +146,8 @@ class MainWindow(QMainWindow):
 
         # The widgets
         self.titleBar = TitleBarWidget("밀양 우주천문대, 스포츠센터 PC 스케줄러", self) # The title bar
-        self.pduCtrl1 = self.createPduCtrl() # First pdu controller
-        self.pduCtrl2 = self.createPduCtrl() # Second pdu controller
+        self.pduCtrl1 = self.createPduCtrl("우주천문대 PC") # First pdu controller
+        self.pduCtrl2 = self.createPduCtrl("스포츠센터 PC") # Second pdu controller
         self.bottomBar = QVBoxLayout()
         self.bottomBar.setContentsMargins(0, int(self.spacing/3), 0, int(self.spacing/3))
         self.bottomBar.addWidget(QLabel(text = "POPSLINE", parent = self))
@@ -190,10 +190,10 @@ class MainWindow(QMainWindow):
         # Remove the decoration of the window
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.CustomizeWindowHint)
 
-    def createPduCtrl(self):
+    def createPduCtrl(self, title: str):
         '''
         '''
-        pdu = PduControlWidget()
+        pdu = PduControlWidget(title)
         return pdu
     
     def resizeEvent(self, evt):
@@ -329,6 +329,7 @@ class ControlInputWidget(QWidget):
         # Validate button
         self.validate = QPushButton(text="확인")
         self.validate.setFixedSize(64, 32)
+        self.validate.pressed.connect(self.onValidated)
         self.validate.setStyleSheet("""
             QPushButton {
                 background-color: white;
@@ -343,7 +344,6 @@ class ControlInputWidget(QWidget):
                 background-color: #dedede;
             }
         """)
-
         self.setObjectName("control-input-widget")
 
         # self.setStyleSheet(""" QWidget { background-color: transparent; border: none; } """)
@@ -376,9 +376,9 @@ class ControlInputWidget(QWidget):
     def fireTimeChanged(self, time: QTime):
         self.events.timeChanged.emit(time)
 
-    @Slot(QPushButton)
-    def onValidated(self, button: QPushButton):
-        self.events.validated.emit(button)
+    @Slot()
+    def onValidated(self):
+        self.events.validated.emit(self.validate)
 
 
 ''' Switch Widget classes '''
@@ -476,8 +476,9 @@ class ChannelWidget(QWidget):
     '''
     def __init__(self):
         super().__init__()
-        self.pressedIndex = -1
+        self.events = self.CWEvent()
 
+        # UI layout
         mLayout = QGridLayout()
         mLayout.setHorizontalSpacing(35)
 
@@ -501,9 +502,10 @@ class ChannelWidget(QWidget):
         # Setting the layout of the widget.
         self.setLayout(mLayout)
 
-    def buttonPressed(self, args, data):
-        print(args, data)
-        pass
+    def buttonPressed(self, data, eventArgs: SWEventArgs):
+        # print(data)
+        # print(eventArgs)
+        self.events.buttonPressed.emit(CWEventArgs(data[0], eventArgs.status, data[1]))
 
 class SectionWidget(QWidget):
     '''
@@ -576,9 +578,10 @@ class PduControlWidget(QWidget):
     '''
     def __init__(self, title: str = ""):
         super().__init__()
+        self.title = title
         
         # Time configuration section
-        self.timeSection = SectionWidget("우주천문대 PC")
+        self.timeSection = SectionWidget(self.title)
         self.mStartTime = ControlInputWidget("시작시간")
         self.mEndTime = ControlInputWidget("종료시간")
         self.timeSection.addWidget(self.mStartTime)

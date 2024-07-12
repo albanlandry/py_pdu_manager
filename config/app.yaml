@@ -1,0 +1,7 @@
+version: 1.0
+title: 밀양 우주천문대, 스포츠센터 PC 스케줄러
+pdus: 
+  - name: 우주천문대 PC
+    url: https//10.1.142.29
+  - name: 스포츠센터 PC
+    url: https//10.1.142.139

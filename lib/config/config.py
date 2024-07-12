@@ -1,5 +1,6 @@
 import configparser
 import os
+import yaml
 
 def create_default_config(file_path):
     config = configparser.ConfigParser()
@@ -29,6 +30,12 @@ def ensure_config_exists(file_path):
     else:
         print(f"Config file already exists at {file_path}")
 
+def load_app_config(file_path):
+    with open(file_path, 'r') as file:
+        config = yaml.safe_load(file)
+    
+    return config
+
 def read_config(file_path):
     config = configparser.ConfigParser()
     config.read(file_path)
@@ -38,7 +45,10 @@ def read_config(file_path):
         for key in config[section]:
             print(f"  {key} = {config[section][key]}")
 
+
+
+
 # Path to the config file
-config_file_path = 'config.ini'
-ensure_config_exists(config_file_path)
-read_config(config_file_path)
+config_file_path= 'config/app.yaml'
+# ensure_config_exists(config_file_path)
+# read_config(config_file_path)

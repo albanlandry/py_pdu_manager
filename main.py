@@ -1,12 +1,17 @@
 from ui.app import MainWindow, PduEventHandler
 from manager.pdu import PduController
 from PyQt6.QtWidgets import QApplication
-import sys
+import sys, os
 import lib.pdu as lib_pdu
 from lib.pdu import ApplicationSettings, AppSettings, ConfigLoader, PduController, PduStatus, PduStruct
 from lib.network import HttpRequest
+from lib.config import config
 
 if __name__ == '__main__':
+    appconfig = config.load_app_config(os.path.join(os.path.dirname(__file__), config.config_file_path))
+
+    print(appconfig)
+
     appsetting:AppSettings = ConfigLoader.LoadSettings(lib_pdu.app_config_file_path)
     pduConfig:PduStruct = ConfigLoader.LoadPDUSettings(lib_pdu.pdu_config_file_path)
     pduCtrl:PduController = PduController.GetInstance(5001)
@@ -14,6 +19,8 @@ if __name__ == '__main__':
 
     print(appsetting, pduConfig, pduStatus)
 
+    pduEvent1 = PduEventHandler()
+    # pduEvent1.timeEvent.onEndTimeChanged
 
     app = QApplication(sys.argv)
     main = MainWindow()
@@ -35,3 +42,11 @@ if __name__ == '__main__':
     """)
 
     app.exec()
+
+    
+    ''' Events handling functions '''
+    def onValidateEndTime():
+        pass
+
+    def onValidateStartTime():
+        pass
