@@ -7,9 +7,18 @@ import html
 # Path to the currently running script
 script_path = os.path.abspath(__file__)
 # app_config_file_path = os.path.join(os.path.dirname(script_path), "..", "config", "config.cnf")
-app_config_file_path = "/Volumes/Storage/Python/PDUManager/config/config.cnf"
 # pdu_config_file_path = os.path.join(os.path.dirname(script_path), "..", "config", "pdu.config.xml")
-pdu_config_file_path = "/Volumes/Storage/Python/PDUManager/config/pdu.config.xml"
+# pdu_config_file_path = "/Volumes/Storage/Python/PDUManager/config/pdu.config.xml"
+#PDU 1
+app_config_file_path ="C:/Users/Administrator/OneDrive/Documents/Programming/Python/py_pdu_manager/config/config.cnf"
+pdu_config_file_path = "C:/Users/Administrator/OneDrive/Documents/Programming/Python/py_pdu_manager/config/pdu.config.xml"
+
+#PDU 2
+app_config_file_path2 = "C:/Users/Administrator/OneDrive/Documents/Programming/Python/py_pdu_manager/config/config2.cnf"
+pdu_config_file_path2 = "C:/Users/Administrator/OneDrive/Documents/Programming/Python/py_pdu_manager/config/pdu-config2.xml"
+
+# app_config_file_path2 = "/Volumes/Storage/Python/PDUManager/config/config.cnf"
+# pdu_config_file_path2 = "/Volumes/Storage/Python/PDUManager/config/pdu.config.xml"
 
 # Add reference to the DLL
 clr.AddReference(os.path.join(os.path.dirname(script_path), "pdu_lib", "pdu_library.dll"))
@@ -39,9 +48,9 @@ def loadPDUConfig(path: str = pdu_config_file_path):
 
     return pduDataXml
 # print(app_config_file_path, pdu_config_file_path)
-print("Sub", Scheduler.__all__)
-print("Sub", Scheduler.Models.__all__)
-print("Sub", Scheduler.Logger.__all__)
+# print("Sub", Scheduler.__all__)
+# print("Sub", Scheduler.Models.__all__)
+# print("Sub", Scheduler.Logger.__all__)
 # # print("Sub", Scheduler.Exceptions.__all__)
 # pprint(Scheduler.__dict__)
 

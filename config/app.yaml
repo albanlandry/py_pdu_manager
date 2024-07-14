@@ -3,5 +3,28 @@ title: 밀양 우주천문대, 스포츠센터 PC 스케줄러
 pdus: 
   - name: 우주천문대 PC
     url: https//10.1.142.29
+    pins:
+      - device: beam_1_yn
+        type: NEC 프로젝터
+        channel: 2
+        turnoff: false
+        ip: 10.1.142.28
+        port: 7142
+      - device: Light
+        type: 기본 장비
+        channel: 6
+        turnoff: true
+      - device: speaker_yn
+        type: 기본 장비
+        channel: 8
+        turnoff: true
+      - device: speaker_yn
+        type: PC
+        channel: 1
+        turnoff: false
+      - device: base_t
+        type: 기본 장비
+        channel: 3
+        turnoff: false
   - name: 스포츠센터 PC
     url: https//10.1.142.139

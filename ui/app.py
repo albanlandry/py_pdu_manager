@@ -12,6 +12,8 @@ from functools import partial
 from lib.pdu import AppSettings, PduStruct
 from utils.convert import str_to_qtime
 
+from pprint import pprint
+
 path = os.path
 
 CONFIG = {
@@ -19,15 +21,34 @@ CONFIG = {
     "image_folder": "res/images" 
 }
 
-Channels = {"CH1": "PC", 
-            "CH2": "빔프로젝터",
-            "CH3": "HDMI 리피터",
+# Channels = {"CH1": "PC", 
+#             "CH2": "빔프로젝터",
+#             "CH3": "HDMI 리피터",
+#             "CH4": "",
+#             "CH5": "",  
+#             "CH6": "조명", 
+#             "CH7": "",
+#             "CH8": "앰프(오디오)"
+#             }
+
+Channels = {"CH1": "", 
+            "CH2": "",
+            "CH3": "",
             "CH4": "",
             "CH5": "",  
-            "CH6": "조명", 
+            "CH6": "", 
             "CH7": "",
-            "CH8": "앰프(오디오)"
+            "CH8": ""
             }
+
+def get_widgets_from_layout(layout):
+    widgets = []
+    for i in range(layout.count()):
+        item = layout.itemAt(i)
+        widget = item.widget()
+        if widget:
+            widgets.append(widget)
+    return widgets
 
 '''
 Event handlers
@@ -40,7 +61,7 @@ class PduEventHandler:
         onvalidateEndTime = Callable[[QTime], None]
 
     class PduChannelEventHandler:
-        onChannelPressed = Callable[[bool], None]
+        onChannelPressed = Callable[[any], None]
 
     def __init__(self): 
         self.timeEvent = self.TimeEventHandler()
@@ -200,12 +221,38 @@ class MainWindow(QMainWindow):
         self.setFixedSize(evt.size())
     
     def updatePdu(self, id: int, pduStruct:PduStruct, config:AppSettings, eventHandler:PduEventHandler = None):
-        self.pduCtrl1.mStartTime.setTime(str_to_qtime(config.StartTime))
-        self.pduCtrl1.mEndTime.setTime(str_to_qtime(config.EndTime))
+        
+        pdu = None
+        if id == 1:
+            pdu = self.pduCtrl1
+        elif id == 2:
+            pdu = self.pduCtrl2
+        
+        pdu.mStartTime.setTime(str_to_qtime(config.StartTime))
+        pdu.mEndTime.setTime(str_to_qtime(config.EndTime))
         # print(id, pduStruct, config.StartTime)
+        self.eventHander = eventHandler
+        pins = self.pduStructToChannel(pduStruct)
+        
+        pdu.pduChannels.updateChannels(pins)
+
         if eventHandler is not None:
             print("Initialize the event handler")
-
+            pdu.pduChannels.events.buttonPressed.connect(self.eventHander.pduEvent.onChannelPressed)
+            
+    def pduStructToChannel(self, pduStruct):
+        '''
+        Parameters:
+        - pduStruct (PduStruct)
+        '''
+        pins = Channels.copy()
+        
+        print()
+        for pin in pduStruct.Pins:
+            print(f"{pin} / {pin.DeviceName}")
+            pins[f"CH{pin.Pin}"] = pin.DeviceName
+            
+        return pins
 
 '''
 Color
@@ -447,6 +494,9 @@ class SwitchWidget(QWidget):
 
     def buttonOffPressed(self):
         self.events.pressed.emit(SWEventArgs(SwitchButton.OFF, self.btnOn, self.btnOff))
+    
+    def setLabelUI(self, text: str):
+        self.labelUI.setText(text)
 
 
 '''
@@ -469,7 +519,7 @@ class CWEventArgs:
 ChannelWidget
 '''
 class ChannelWidget(QWidget):    
-    class CWEvent(QObject):
+    class  CWEvent(QObject):
         buttonPressed = Signal(CWEventArgs)
 
     '''
@@ -479,8 +529,8 @@ class ChannelWidget(QWidget):
         self.events = self.CWEvent()
 
         # UI layout
-        mLayout = QGridLayout()
-        mLayout.setHorizontalSpacing(35)
+        self.mLayout = QGridLayout()
+        self.mLayout.setHorizontalSpacing(35)
 
         #Adding all the buttons
         nbCols = 2
@@ -494,13 +544,23 @@ class ChannelWidget(QWidget):
             row = index % nbRows
 
             switch = SwitchWidget(f"{key}: {value}")
-            mLayout.addWidget(switch, row, col)
+            self.mLayout.addWidget(switch, row, col)
 
             # Attach event to the switch
             switch.events.pressed.connect(partial(self.buttonPressed, (index, switch)))
 
         # Setting the layout of the widget.
-        self.setLayout(mLayout)
+        self.setLayout(self.mLayout)
+        
+    def updateChannels(self, channels):
+        '''
+        Parameters:
+        - channels: List
+        '''
+        widgets = get_widgets_from_layout(self.mLayout)
+        
+        for index, (key, value) in enumerate(channels.items()):
+            widgets[index].setLabelUI(f"{key}: {value}")
 
     def buttonPressed(self, data, eventArgs: SWEventArgs):
         # print(data)

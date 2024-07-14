@@ -31,7 +31,7 @@ def ensure_config_exists(file_path):
         print(f"Config file already exists at {file_path}")
 
 def load_app_config(file_path):
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
         config = yaml.safe_load(file)
     
     return config
@@ -49,6 +49,6 @@ def read_config(file_path):
 
 
 # Path to the config file
-config_file_path= 'config/app.yaml'
+config_file_path= os.path.join('config', 'app.yaml')
 # ensure_config_exists(config_file_path)
 # read_config(config_file_path)

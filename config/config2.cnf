@@ -1,0 +1,11 @@
+[Scheduler]
+ApplicationFolder=C:\Users\popsl\Desktop\Interactive
+VideoFolder=C:\Users\popsl\Desktop\Video
+VideoPlayer=C:\Users\popsl\Desktop\VideoPlayer\0205VideoTest\V1.exe
+VideoPlayerParams=
+start_time=1950
+end_time=2200
+content=A1,A2
+ID=0002
+KeepOrder=true
+Port=8080
