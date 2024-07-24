@@ -7,8 +7,11 @@ from lib.pdu import ApplicationSettings, AppSettings, ConfigLoader, PduControlle
 from lib.network import HttpRequest
 from lib.config import config
 
+
 def onChannelPressed(args):
-    pduConfig:PduStruct = ConfigLoader.LoadPDUSettings(lib_pdu.pdu_config_file_path)
+    pduConfig:PduStruct = config.loadPduSettings(lib_pdu.pdu_config_file_path)
+    pduCtrl:PduController = PduController.GetInstance(5001)
+
     
     print(f"IP: {pduConfig.Ip}")
     
@@ -18,7 +21,8 @@ def onChannelPressed(args):
         pduCtrl.TurnPinOff(pduConfig, args.channel + 1)
 
 def onChannelPressed2(args):
-    pduConfig:PduStruct = ConfigLoader.LoadPDUSettings(lib_pdu.pdu_config_file_path)
+    pduConfig:PduStruct = config.loadPduSettings(lib_pdu.pdu_config_file_path)
+    pduCtrl:PduController = PduController.GetInstance(5001)
     
     print(f"IP: {pduConfig.Ip}")
     
@@ -28,18 +32,18 @@ def onChannelPressed2(args):
         pduCtrl.TurnPinOff(pduConfig, args.channel + 1)
 
 if __name__ == '__main__':
-    appconfig = config.load_app_config(os.path.join(os.path.dirname(__file__), config.config_file_path))
+    appconfig = config.load_app_config(os.path.join(os.path.dirname(__file__), config.CONFIG_FILE_PATH))
 
     print(lib_pdu.pdu_config_file_path)
     print(lib_pdu.pdu_config_file_path2)
 
     # PDU 1
-    appsetting:AppSettings = ConfigLoader.LoadSettings(lib_pdu.app_config_file_path)
-    pduConfig:PduStruct = ConfigLoader.LoadPDUSettings(lib_pdu.pdu_config_file_path)
+    appsetting:AppSettings = config.loadSettings(lib_pdu.app_config_file_path)
+    pduConfig:PduStruct = config.loadPduSettings(lib_pdu.pdu_config_file_path)
     
     # PDU 2
-    appsetting2:AppSettings = ConfigLoader.LoadSettings(lib_pdu.app_config_file_path2)
-    pduConfig2:PduStruct = ConfigLoader.LoadPDUSettings(lib_pdu.pdu_config_file_path2)
+    appsetting2:AppSettings = config.loadSettings(lib_pdu.app_config_file_path2)
+    pduConfig2:PduStruct = config.loadPduSettings(lib_pdu.pdu_config_file_path2)
 
     pduEvent1 = PduEventHandler()
     pduEvent1.pduEvent.onChannelPressed = onChannelPressed

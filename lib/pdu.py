@@ -1,3 +1,4 @@
+ 
 import clr
 import os
 from pprint import pprint
@@ -6,16 +7,18 @@ import html
 
 # Path to the currently running script
 script_path = os.path.abspath(__file__)
+
+print(f"Realaptth: {os.path.realpath(os.path.join(os.path.dirname(script_path), "..", "config", "pdu-config2.xml"))}")
 # app_config_file_path = os.path.join(os.path.dirname(script_path), "..", "config", "config.cnf")
 # pdu_config_file_path = os.path.join(os.path.dirname(script_path), "..", "config", "pdu.config.xml")
 # pdu_config_file_path = "/Volumes/Storage/Python/PDUManager/config/pdu.config.xml"
 #PDU 1
-app_config_file_path ="C:/Users/Administrator/OneDrive/Documents/Programming/Python/py_pdu_manager/config/config.cnf"
-pdu_config_file_path = "C:/Users/Administrator/OneDrive/Documents/Programming/Python/py_pdu_manager/config/pdu.config.xml"
+app_config_file_path = os.path.realpath(os.path.join(os.path.dirname(script_path), "..", "config", "config.cnf"))
+pdu_config_file_path = os.path.realpath(os.path.join(os.path.dirname(script_path), "..", "config", "pdu.config.xml"))
 
 #PDU 2
-app_config_file_path2 = "C:/Users/Administrator/OneDrive/Documents/Programming/Python/py_pdu_manager/config/config2.cnf"
-pdu_config_file_path2 = "C:/Users/Administrator/OneDrive/Documents/Programming/Python/py_pdu_manager/config/pdu-config2.xml"
+app_config_file_path2 = os.path.realpath(os.path.join(os.path.dirname(script_path), "..", "config", "config2.cnf"))
+pdu_config_file_path2 = os.path.realpath(os.path.join(os.path.dirname(script_path), "..", "config", "pdu-config2.xml"))
 
 # app_config_file_path2 = "/Volumes/Storage/Python/PDUManager/config/config.cnf"
 # pdu_config_file_path2 = "/Volumes/Storage/Python/PDUManager/config/pdu.config.xml"
@@ -47,6 +50,11 @@ def loadPDUConfig(path: str = pdu_config_file_path):
     print(ET.fromstring(html.unescape(file_content)))
 
     return pduDataXml
+
+def loadSettings(path):
+    pass
+
+
 # print(app_config_file_path, pdu_config_file_path)
 # print("Sub", Scheduler.__all__)
 # print("Sub", Scheduler.Models.__all__)
